@@ -1,0 +1,104 @@
+# Importing Python libraries
+import bs4 as BeautifulSoup
+import urllib.request  
+import csv
+import re
+
+
+countries=[]
+f=open("link.txt","r")
+for line in f:
+    text=line
+    print(text)
+    text=text.rstrip("\n")
+    countries.append(text.split(","))
+url=[]
+for place in countries:
+    country=place
+    url.append(country[1])
+print(url)
+
+
+# Fetching the content from the Wikipedia URL
+get_data = urllib.request.urlopen(url[0])
+
+read_page = get_data.read()
+
+# Parsing the Wikipedia URL content and storing the page text
+parse_page = BeautifulSoup.BeautifulSoup(read_page,'html.parser')
+
+info=parse_page.find(class_='infobox ib-country vcard')
+
+info=info.prettify()
+
+info=re.sub('^<style>*</style>','',info)
+info=re.sub('<.*?>','',info)
+info=re.sub(r' +',' ',info)
+info=re.sub(r'^.mw-.+}$','',info)
+
+info=info.replace("\xa0"," ")
+
+
+info=info.split('\n')
+newtext=[]
+    
+b=0
+while (b<len(info)):
+    if not (str(info[b])==(", ") or str(info[b])==(" ") or str(info[b])==(' ') or str (info[b])==('')):
+        if not (".mw-" in str(info[b])):
+            if not ("•" in str(info[b])):
+                newtext.append(str(info[b]).lstrip(' '))
+    b=b+1
+    
+
+
+print (newtext)
+arraydata=[]
+#0 for Name, 1 for Capital, 2 for Native Languages, 3 for Area, 4 for Population, 5 for GDP.
+countrydata=[]
+arraydata.append(newtext[0])
+print (newtext.index('Capital'))
+print (newtext[newtext.index('Capital')+1])
+arraydata.append(newtext[newtext.index('Capital')+1])
+
+
+
+
+
+"""
+
+info=re.sub('&nbsp;','',info)
+info=re.sub('^<style>.*</style>','',info)
+info=re.sub('<.*?>', '',info)
+info=re.sub(r' +',' ',info,flags=re.MULTILINE)
+
+info=re.sub(r'\n','',info)
+
+info=info.split("<tr")
+
+print(info)
+"""
+
+"""
+
+info=re.sub(r'https\S+','',info,flags=re.MULTILINE)
+info=re.sub(r'<img alt=+','',info,flags=re.MULTILINE)
+info=re.sub(r'<class=+','',info,flags=re.MULTILINE)
+info=re.sub(r'a href=+','',info,flags=re.MULTILINE)
+info=re.sub(r'style=+','',info,flags=re.MULTILINE)
+info=re.sub('<[^<]+?>', '', info)
+"""
+
+
+
+"""for x in info:
+    if (str(info[b])==(", ") or str(info[b])==(" ") or str(info[b])==(' ')):
+        info.pop(b)
+    else:
+        if ".mw-" in str(info[b]):
+            info.pop(b)
+        elif "•" in str(info[b]):
+            info.pop(b)
+        else:
+            newtext=newtext+"\n"+str(info[b])
+            """
