@@ -102,3 +102,12 @@ info=re.sub('<[^<]+?>', '', info)
         else:
             newtext=newtext+"\n"+str(info[b])
             """
+
+
+#Output into .txt file
+with open ('output.txt','w') as f:
+    for count in range (len(countrydata)):
+        displaycountrydata=countrydata[count]
+        for countx in range(len(displaycountrydata)):
+            f.write(str(displaycountrydata[countx]+", "))
+        f.write("\n")

@@ -3,12 +3,17 @@ import bs4 as BeautifulSoup
 import urllib.request  
 import csv
 import re
+import math
+import statistics
+import numpy as np
+
 
 countries=[]
 headers=["Country Name", "Capital", "Languages", "Total Area", "Population", "GDP (PPP)", "GDP (Nominal)"]
 linkfiledata=[]
 url=[]
 
+#Get wikipedia links
 f=open("link.txt","r")
 for line in f:
     linkfiledata=line
@@ -20,7 +25,6 @@ for line in f:
 countrydata=[]
 
 #Scraping and Storing
-
 for count in range (len(countries)):
     get_data = urllib.request.urlopen(url[count])
 
@@ -109,7 +113,6 @@ for count in range (len(countries)):
     countrydata.append(data)
 
 #Data Cleaning
-#print (countrydata)
 for count in range (len(countrydata)):
     editcountrydata = countrydata[count]
     for secondcount in range (len(editcountrydata)):
@@ -154,19 +157,12 @@ for count in range (len(countrydata)):
     countrydata[count]=editcountrydata
 
 
+#Output table data.
 for count in range (len(countrydata)):
     displaycountrydata = countrydata[count]
     for secondcount in range (len(displaycountrydata)):
         print (displaycountrydata[secondcount])
     print ("\n")
-
-#Output into .txt file
-with open ('output.txt','w') as f:
-    for count in range (len(countrydata)):
-        displaycountrydata=countrydata[count]
-        for countx in range(len(displaycountrydata)):
-            f.write(str(displaycountrydata[countx]+", "))
-        f.write("\n")
 
 
 #Output into .csv file
@@ -213,3 +209,64 @@ for count in range(len(countrydata)):
     GDP=GDP.replace(" trillion",'')
     GDPlist.append(float(GDP))
 print ("The country with the largest GDP of $" + str(max(GDPlist)) +" trillion is the country of " + str(countries[GDPlist.index(max(GDPlist))]))
+print ("\n")
+#Write code to compute the Pearson correlation coefficient for pairs of variables, 
+# uch as (area, population), (area, GDP), and (population, GDP), as defined in the documentation at "https://en.wikipedia.org/wiki/Pearson_correlation_coefficient."
+
+#Pearson's correlation coefficient = covariance(X, Y) / (stdv(X) * stdv(Y))
+
+GDPlist
+arealist
+poplist
+
+
+#Formula for Population(Statistics) Standard Deviation 
+# Vector x - mean(x)
+popdeviations= [x - statistics.mean(poplist) for x in poplist]
+# Sum of Vector Differences squared
+sumsquaredeviation=sum([x**2 for x in popdeviations])
+# Squareroot of sum/population(vector size/number of observations)
+#deviation between countries' population
+stdx=math.sqrt( sumsquaredeviation/(len(poplist)) )
+
+#deviation between countries' GDP (PPP)
+GDPdeviations= [x - statistics.mean(GDPlist) for x in GDPlist]
+sumsquaredeviation=sum([x**2 for x in GDPdeviations])
+stdy=math.sqrt( sumsquaredeviation/(len(GDPlist)) )
+
+#deviation between countries' total area
+areadeviations= [x - statistics.mean(arealist) for x in arealist]
+sumsquaredeviation=sum([x**2 for x in areadeviations])
+stdz=math.sqrt( sumsquaredeviation/(len(arealist)))
+
+
+popdeviations= [x - statistics.mean(poplist) for x in poplist]
+GDPdeviations=[x - statistics.mean(GDPlist) for x in GDPlist]
+areadeviations=[x - statistics.mean(arealist) for x in arealist]
+
+popgdpcovariance=sum([a*b for a,b in zip (popdeviations,GDPdeviations)])/(len(poplist))
+popareacovariance=sum([a*b for a,b in zip (popdeviations,areadeviations)])/(len(poplist))
+areagdpcovariance=sum([a*b for a,b in zip (areadeviations,GDPdeviations)])/(len(arealist))
+
+
+#Formula: Covariance XY / Standard Deviation X * Standard Deviation Y
+#Pearson Correlation between Population & Total Area
+PearsonCorrelation=popareacovariance/(stdx*stdz)
+print ("The Pearson Correlation between Population and Total Area is: " +str(PearsonCorrelation))
+#Pearson Correlation between Total Area & GDP
+PearsonCorrelation=areagdpcovariance/(stdz*stdy)
+print ("The Pearson Correlation between GDP and Total Area is: " +str(PearsonCorrelation))
+#Pearson Correlation between Population & GDP
+PearsonCorrelation=popgdpcovariance/(stdx*stdy)
+print ("The Pearson Correlation between Population and GDP is: " +str(PearsonCorrelation))
+print ("As the Pearson Correlation coefficient between these 3 variables are greater than 0 and above 0.5, it can be concluded that these three variables are highly correlated with one another.")
+
+
+
+
+
+
+
+
+
+
