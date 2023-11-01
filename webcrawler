@@ -6,22 +6,34 @@ import re
 import math
 import statistics
 import numpy as np
+import os.path
 
 
 countries=[]
-headers=["Country Name", "Capital", "Languages", "Total Area", "Population", "GDP (PPP)", "GDP (Nominal)"]
+headers=["Country Name", "Capital", "Languages", "Total Area", "Population", "GDP (PPP)"]
 linkfiledata=[]
 url=[]
 
 #Get wikipedia links
-f=open("link.txt","r")
-for line in f:
-    linkfiledata=line
-    linkfiledata=linkfiledata.rstrip("\n")
-    linkfiledata=linkfiledata.split(',')
-    countries.append(linkfiledata[0])
-    url.append(linkfiledata[1])
-
+path='./link.txt'
+if (os.path.isfile(path)):
+    f=open("link.txt","r")
+    for line in f:
+        linkfiledata=line
+        linkfiledata=linkfiledata.rstrip("\n")
+        linkfiledata=linkfiledata.split(',')
+        countries.append(linkfiledata[0])
+        url.append(linkfiledata[1])
+else:
+    countries=['Canada','China','US','Korea','UK','France','Turkey','Italy']
+    url=['https://en.wikipedia.org/wiki/Canada',
+         'https://en.wikipedia.org/wiki/China',
+         'https://en.wikipedia.org/wiki/United_States',
+         'https://en.wikipedia.org/wiki/Korea',
+        'https://en.wikipedia.org/wiki/United_Kingdom',
+        'https://en.wikipedia.org/wiki/France',
+        'https://en.wikipedia.org/wiki/Turkey',
+        'https://en.wikipedia.org/wiki/Italy']
 countrydata=[]
 
 #Scraping and Storing
@@ -92,7 +104,9 @@ for count in range (len(countries)):
                     data.append(rows[b+1].find("td").text.rstrip().replace('\xa0',''))
                     gdpcounter=1
         b=b+1
-    if (count==3 and gdpcounter==0):
+    if (count==3 and gdpcounter==0): 
+                    #The Korea wiki page does not have GDP. So I get the GDP data from South Korea.
+                    #Because NKorea's GDP is miniscule compared to SKorea.
                     gdpcounter=1
                     get_data = urllib.request.urlopen('https://en.wikipedia.org/wiki/South_Korea')
 
@@ -121,7 +135,7 @@ for count in range (len(countrydata)):
         
         if ("\ufeff" in editcountrydata[secondcount]):
             text=text[0:text.index("\ufeff")]
-        if (secondcount==1):
+        if (secondcount==1): 
             if (re.search(r'[0-9]',text)):
                 findgarbage=""
                 findgarbage=re.search(r'[0-9]',text)
@@ -135,7 +149,7 @@ for count in range (len(countrydata)):
             text=text[0:re.search(r'[0-9]{1}[a-zA-Z]|[a-zA-Z]{1}[0-9]',text).end()-1] + " "+ text[re.search(r'[0-9]{1}[a-zA-Z]|[a-zA-Z]{1}[0-9]',text).end()-1:]
         if (secondcount==2 and ('level' in text)):
             text=text[text.index('level')+6:]
-        if (secondcount==3):
+        if (secondcount==3): #US total area unit switch
             if(count==2):
                 areaswitch1=text[text.index("("):]
                 areaswitch1=areaswitch1.replace("(",'')
@@ -166,7 +180,7 @@ for count in range (len(countrydata)):
 
 
 #Output into .csv file
-with open('output.csv','w') as f:
+with open('output.csv','w', newline='') as f:
     writer=csv.writer(f)  
     writer.writerow(headers)
     for count in range (len(countrydata)):
@@ -183,6 +197,7 @@ with open('output.csv','w') as f:
 #4 is Population
 #5 is GDP (PPP)
 
+#Find country with greatest population
 poplist=[]
 for count in range(len(countrydata)):
     loopthroughcountry=countrydata[count]
@@ -191,6 +206,7 @@ for count in range(len(countrydata)):
     poplist.append(int(population))
 print ("The country with the highest population of " + str(max(poplist)) +" is the country of " + str(countries[poplist.index(max(poplist))]))
 
+#Find country with greatest total area
 arealist=[]
 for count in range(len(countrydata)):
     loopthroughcountry=countrydata[count]
@@ -201,6 +217,7 @@ for count in range(len(countrydata)):
 print ("The country with the largest area of " + str(max(arealist)) +" km2 is the country of " + str(countries[arealist.index(max(arealist))]))
 GDPlist=[]
 
+#Find country with greatest GDP
 for count in range(len(countrydata)):
     loopthroughcountry=countrydata[count]
     GDP=str(loopthroughcountry[5])
@@ -214,11 +231,6 @@ print ("\n")
 # uch as (area, population), (area, GDP), and (population, GDP), as defined in the documentation at "https://en.wikipedia.org/wiki/Pearson_correlation_coefficient."
 
 #Pearson's correlation coefficient = covariance(X, Y) / (stdv(X) * stdv(Y))
-
-GDPlist
-arealist
-poplist
-
 
 #Formula for Population(Statistics) Standard Deviation 
 # Vector x - mean(x)
