@@ -5,14 +5,14 @@ import csv
 import re
 import math
 import statistics
-import numpy as np
+import numpy as np #Not used. Could use it, but decided to do it manually. 
 import os.path
 
 
 countries=[]
+url=[]
 headers=["Country Name", "Capital", "Languages", "Total Area", "Population", "GDP (PPP)"]
 linkfiledata=[]
-url=[]
 
 #Get wikipedia links
 path='./link.txt'
@@ -24,7 +24,7 @@ if (os.path.isfile(path)):
         linkfiledata=linkfiledata.split(',')
         countries.append(linkfiledata[0])
         url.append(linkfiledata[1])
-else:
+else: #If the link.txt file is not there.
     countries=['Canada','China','US','Korea','UK','France','Turkey','Italy']
     url=['https://en.wikipedia.org/wiki/Canada',
          'https://en.wikipedia.org/wiki/China',
