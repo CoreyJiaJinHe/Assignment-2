@@ -1,3 +1,6 @@
+#Name: Corey He
+#ID: 217253527
+
 # Importing Python libraries
 import bs4 as BeautifulSoup
 import urllib.request  
